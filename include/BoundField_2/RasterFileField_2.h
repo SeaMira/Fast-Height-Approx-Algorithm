@@ -33,7 +33,7 @@ class RasterFileField_2 : public BoundField_2<FT> {
                     return _scale * _img.pixelColor(x, y).quantumRed();
                 }
                 case BILINEAR: {
-                    size_t x1 = floor(x), x2 = floor(x+1), y1 = floor(y-1), y2 = floor(y);
+                    size_t x1 = floor(x), x2 = floor(x+1), y1 = floor(y-1), y2 = floor(y); //this is most certainly wrong
                     FT q11, q12, q21, q22;
                     q11 = _scale * _img.pixelColor(x1, y1).quantumRed();
                     q12 = _scale * _img.pixelColor(x1, y2).quantumRed();
