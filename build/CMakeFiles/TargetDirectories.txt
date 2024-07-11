@@ -1,0 +1,11 @@
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/CGAL_Qt5_moc_and_resources.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/main.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/ALL_CGAL_TARGETS.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/cgal_check_build_system.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/edit_cache.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/rebuild_cache.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/CGAL_Qt5_moc_and_resources_autogen_timestamp_deps.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CMakeFiles/CGAL_Qt5_moc_and_resources_autogen.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/src/CMakeFiles/fastHAprox.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/src/CMakeFiles/edit_cache.dir
+D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/src/CMakeFiles/rebuild_cache.dir

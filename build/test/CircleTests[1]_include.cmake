@@ -1,0 +1,5 @@
+if(EXISTS "D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/test/CircleTests[1]_tests.cmake")
+  include("D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/test/CircleTests[1]_tests.cmake")
+else()
+  add_test(CircleTests_NOT_BUILT CircleTests_NOT_BUILT)
+endif()

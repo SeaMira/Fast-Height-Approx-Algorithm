@@ -1,0 +1,40 @@
+# ninja log v5
+17	5379	7423291930388509	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp	a9cdaa4e4223fc04
+17	5379	7423291930388509	CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp	a9cdaa4e4223fc04
+17	5379	7423291930388509	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CGAL_Qt5_moc_and_resources_autogen/timestamp	a9cdaa4e4223fc04
+17	5379	7423291930388509	CGAL_Qt5_moc_and_resources_autogen/timestamp	a9cdaa4e4223fc04
+53	2316	7423292104406531	CGAL_Qt5_moc_and_resources_autogen/timestamp	a9cdaa4e4223fc04
+53	2316	7423292104406531	CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp	a9cdaa4e4223fc04
+53	2316	7423292104406531	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CGAL_Qt5_moc_and_resources_autogen/timestamp	a9cdaa4e4223fc04
+53	2316	7423292104406531	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp	a9cdaa4e4223fc04
+2326	2577	7423292107895157	qrc_Input.cpp	e0ab250954a85f
+2326	2577	7423292107895157	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/qrc_Input.cpp	e0ab250954a85f
+2330	2577	7423292107895157	qrc_File.cpp	fcc45fbe38d70df3
+2330	2577	7423292107895157	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/qrc_File.cpp	fcc45fbe38d70df3
+2335	2577	7423292107895157	qrc_Triangulation_2.cpp	d7cdcb5fcf779d9e
+2335	2577	7423292107895157	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/qrc_Triangulation_2.cpp	d7cdcb5fcf779d9e
+2321	2579	7423292107925170	qrc_CGAL.cpp	fbb77b1f4d750270
+2321	2579	7423292107925170	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/qrc_CGAL.cpp	fbb77b1f4d750270
+2317	2742	7423292109540613	ui_ImageInterface.h	acd2a804abfb4bac
+2317	2742	7423292109540613	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/ui_ImageInterface.h	acd2a804abfb4bac
+2746	2830	7423292110420627	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Input.cpp.obj	b1c466fcfb08258b
+2751	2832	7423292110450628	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Triangulation_2.cpp.obj	f4581cc6d930804a
+2749	2833	7423292110450628	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_File.cpp.obj	128a93b34d63cdc4
+2744	2874	7423292110870629	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_CGAL.cpp.obj	86adb49deec2f03d
+2753	3172	7423292113846027	CMakeFiles/main.dir/main.cpp.obj	b5485f7a8325bc0
+2742	9986	7423292181931871	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp.obj	b0b44163bc9d1f37
+9992	10207	7423292184201864	libCGAL_Qt5_moc_and_resources.a	fb85a6efbbb32c8b
+35	2323	7423292641680425	CGAL_Qt5_moc_and_resources_autogen/timestamp	a9cdaa4e4223fc04
+35	2323	7423292641680425	CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp	a9cdaa4e4223fc04
+35	2323	7423292641680425	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CGAL_Qt5_moc_and_resources_autogen/timestamp	a9cdaa4e4223fc04
+35	2323	7423292641680425	D:/Users/Escritorio/U/Otoño 2024 - 9no semestre/Fast-Height-Approx-Algorithm/build/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp	a9cdaa4e4223fc04
+2331	2419	7423292643458144	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_File.cpp.obj	128a93b34d63cdc4
+2328	2421	7423292643468159	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Input.cpp.obj	b1c466fcfb08258b
+2333	2426	7423292643528141	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_Triangulation_2.cpp.obj	f4581cc6d930804a
+2326	2473	7423292643998131	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/qrc_CGAL.cpp.obj	86adb49deec2f03d
+2335	2699	7423292646258150	CMakeFiles/main.dir/main.cpp.obj	b5485f7a8325bc0
+2339	6800	7423292687234669	src/CMakeFiles/fastHAprox.dir/mesh_functions.cpp.obj	66f842c772727bcc
+2323	8313	7423292702351751	CMakeFiles/CGAL_Qt5_moc_and_resources.dir/CGAL_Qt5_moc_and_resources_autogen/mocs_compilation.cpp.obj	b0b44163bc9d1f37
+8314	8423	7423292703501746	libCGAL_Qt5_moc_and_resources.a	fb85a6efbbb32c8b
+8423	8498	7423292704261740	src/libfastHAprox.a	df17feb437e4012b
+8498	8620	7423292705421751	main.exe	6aa3b366621aee3e
