@@ -1,107 +1,131 @@
-#include <CGAL/boost/graph/generators.h>
-#include <CGAL/Simple_cartesian.h>
+#ifndef _MESH_FNCTS_H_
+#define _MESH_FNCTS_H_
+
+// delaunay 2d
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Projection_traits_xy_3.h>
+#include <CGAL/Delaunay_triangulation_2.h>
+
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef CGAL::Projection_traits_xy_3<K>  Gt;
+typedef CGAL::Delaunay_triangulation_2<Gt> Delaunay;
+typedef K::Point_3   Point;
+typedef Delaunay::Vertex_handle Vertex_handle;
+typedef Delaunay::Face_handle Face_handle;
+
+#include "BoundField_2/RasterFileField_2.h"
+#include "BoundField_2/FunctionField_2.h"
+#include "PerlinNoise.hpp"
+// msh y lectores
 #include <CGAL/Surface_mesh.h>
+#include <CGAL/IO/OBJ/File_writer_wavefront.h>
+#include <CGAL/IO/OBJ.h>
+
+#include "BoundField_2/RasterFileField_2.h"
+#include "BoundField_2/FunctionField_2.h"
+
+const int SIZE = 64;
+
+using Mesh = CGAL::Surface_mesh<Point>;
+using FT = K::FT;
+
+const siv::PerlinNoise::seed_type seed = 123456u;
+const siv::PerlinNoise perlin{seed};
+
+// Incluye otros encabezados de C++ y Boost
+#include <cassert>
+#include <cfloat>
 #include <vector>
 #include <cmath>
-#include <set>
+#include <cstdlib> 
+#include <ctime> 
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <random>
+#include <unordered_map>
+#include <unordered_set> 
+#include <algorithm> 
 
-typedef CGAL::Simple_cartesian<double> K;
-typedef CGAL::Surface_mesh<K::Point_3> Mesh;
-typedef Mesh::Vertex_index vertex_descriptor;
-typedef Mesh::Face_index face_descriptor;
+FT simple_terrain_func(FT x, FT y) {
+    FT z = 1.0  * perlin.noise2D_01(x, y)
+             + 0.5  * perlin.noise2D_01(2.0*x, 2.0*y)
+             + 0.25 * perlin.noise2D_01(4.0*x, 4.0*y);
+    z = z / (1.0 + 0.5 + 0.25);
+    return pow(z, 3.0);
+}
+
+
+FT lerp(FT a, FT b, FT t) {
+    if (t == 0.0) return a;
+    if (t == 1.0) return b;
+    return a + t * (b - a);
+}
+
+
+void gen_and_save(BoundField_2<FT> &H, std::string fname) {
+    Mesh m;
+
+    // vertices
+    for (int idx_x = 0; idx_x < (SIZE - 1); idx_x++) {
+        for (int idx_y = 0; idx_y < (SIZE-1); idx_y++) {
+            FT x = lerp(H.minX(), H.maxX(), (FT)idx_x / (FT)SIZE);
+            FT y = lerp(H.minY(), H.maxY(), (FT)idx_y / (FT)SIZE);
+
+            FT xr = lerp(H.minX(), H.maxX(), (FT)(idx_x + 1) / (FT)SIZE);
+            FT yu = lerp(H.minY(), H.maxY(), (FT)(idx_y + 1) / (FT)SIZE);
+
+            auto p = m.add_vertex(Point(x, y, H(x,y)));
+            auto pr = m.add_vertex(Point(xr, y, H(xr,y)));
+            auto pu = m.add_vertex(Point(x, yu, H(x,yu)));
+            auto pd = m.add_vertex(Point(xr, yu, H(xr,yu)));
+
+            m.add_face(p, pr, pd);
+            m.add_face(p, pd, pu);
+        }
+    }
+
+    for (const auto &v : m.vertices()) {
+        std::cout << m.point(v) << std::endl;
+    }
+
+    // save to .obj
+    std::ofstream os(fname);
+    CGAL::IO::write_OBJ(fname, m);
+}
+
+
+
 
 
 // Función para interpolar la altura
-double InterpolateHeight(double A, double B, double C, double D, K::Point_3 p) {
-    return -(A * p.x() + B * p.y() + D) / C;
-}
+double InterpolateHeight(double A, double B, double C, double D, Point p);
 
 // Función para escanear el triángulo y encontrar el punto con mayor error
-void scanTriangle(Mesh* m, face_descriptor triangle,
-                  Mesh::Property_map<face_descriptor, vertex_descriptor>& candPos,
-                  Mesh::Property_map<face_descriptor, std::vector<vertex_descriptor>>& pointsInTriangle) {
-    vertex_descriptor best = Mesh::null_vertex();
-    double maxError = 0.0;
 
-    Mesh::Halfedge_index h = m->halfedge(triangle);
-    vertex_descriptor vd0 = m->source(h);
-    vertex_descriptor vd1 = m->source(m->next(h));
-    vertex_descriptor vd2 = m->source(m->next(m->next(h)));
 
-    K::Point_3 p0 = m->point(vd0);
-    K::Point_3 p1 = m->point(vd1);
-    K::Point_3 p2 = m->point(vd2);
+class FstHAproxMesh {
+    private:
+        Delaunay m;
+        BoundField_2<FT> &H;
 
-    double A = (p1.y() - p0.y()) * (p2.z() - p0.z()) - (p1.z() - p0.z()) * (p2.y() - p0.y());
-    double B = (p1.z() - p0.z()) * (p2.x() - p0.x()) - (p1.x() - p0.x()) * (p2.z() - p0.z());
-    double C = (p1.x() - p0.x()) * (p2.y() - p0.y()) - (p1.y() - p0.y()) * (p2.x() - p0.x());
-    double D = -(A * p0.x() + B * p0.y() + C * p0.z());
+        // grid corners
+        double left_x, left_y, right_x, right_y;
 
-    for (vertex_descriptor vd : pointsInTriangle[triangle]) {
-        K::Point_3 p = m->point(vd);
-        double interpolatedHeight = InterpolateHeight(A, B, C, D, p);
-        double error = std::abs(interpolatedHeight - p.z());
-        if (error > maxError) {
-            maxError = error;
-            best = vd;
-        }
-    }
+        std::unordered_map<Face_handle, Vertex_handle> candPos; 
+        // Mesh::Property_map<face_descriptor, vertex_descriptor> candPos;
+        // std::unordered_map<face_descriptor, std::vector<vertex_descriptor>> pointsInTriangle; 
+        // Mesh::Property_map<face_descriptor, std::vector<vertex_descriptor>> pointsInTriangle;
 
-    candPos[triangle] = best;
-    // lógica para actualizar "heap"
-}
+    public:
+        void scanTriangle(Face_handle triangle);
+        Vertex_handle meshInsert(Point p);
+        void insert(Point p);
+        void greedyInsert():
+        // void sortTrianglePoints(face_descriptor f0, face_descriptor f1, face_descriptor f2, std::vector<vertex_descriptor> points);
 
-void meshInsert(Mesh* m, vertex_descriptor p, face_descriptor triangle, Mesh::Property_map<face_descriptor, std::vector<vertex_descriptor>>& pointsInTriangle) {
-    // Obtener las medias aristas del triángulo
-    Mesh::Halfedge_index h = m->halfedge(triangle);
-    Mesh::Halfedge_index h1 = m->next(h);
-    Mesh::Halfedge_index h2 = m->next(h1);
+        FstHAproxMesh(double left_x, double left_y, double right_x, double right_y);
+        FstHAproxMesh(const std::string &path, FT max_scalar, RasterInterpolationType interp = RasterInterpolationType::BILINEAR);
+};
 
-    // Obtener los vértices del triángulo
-    vertex_descriptor vd0 = m->source(h);
-    vertex_descriptor vd1 = m->source(h1);
-    vertex_descriptor vd2 = m->source(h2);
-
-    // Eliminar el triángulo original
-    m->remove_face(triangle);
-
-    // Añadir tres nuevas caras formadas por el nuevo vértice y los vértices del triángulo original
-    face_descriptor f0 = m->add_face(p, vd0, vd1);
-    face_descriptor f1 = m->add_face(p, vd1, vd2);
-    face_descriptor f2 = m->add_face(p, vd2, vd0);
-
-    if (f0 == Mesh::null_face() || f1 == Mesh::null_face() || f2 == Mesh::null_face()) {
-        std::cerr << "Error: Failed to add new faces." << std::endl;
-    }
-
-    // Actualizar pointsInTriangle para los nuevos triángulos
-    std::set<vertex_descriptor> original_points(pointsInTriangle[triangle].begin(), pointsInTriangle[triangle].end());
-    original_points.insert(p); // Añadir el nuevo vértice a los puntos originales
-
-    // Asignar puntos a los nuevos triángulos
-    pointsInTriangle[f0] = {p, vd0, vd1};
-    pointsInTriangle[f1] = {p, vd1, vd2};
-    pointsInTriangle[f2] = {p, vd2, vd0};
-
-    // Repartir los puntos originales en los nuevos triángulos
-    for (vertex_descriptor vd : original_points) {
-        if (vd == vd0 || vd == vd1 || vd == vd2 || vd == p) {
-            continue; // Saltar los vértices del triángulo original y el nuevo vértice
-        }
-        K::Point_3 point = m.point(vd);
-        if (CGAL::collinear(m.point(vd0), m.point(vd1), point)) {
-            pointsInTriangle[f0].push_back(vd);
-        } else if (CGAL::collinear(m.point(vd1), m.point(vd2), point)) {
-            pointsInTriangle[f1].push_back(vd);
-        } else if (CGAL::collinear(m.point(vd2), m.point(vd0), point)) {
-            pointsInTriangle[f2].push_back(vd);
-        }
-    }
-
-    // Eliminar la entrada del triángulo original en pointsInTriangle
-    pointsInTriangle.remove(triangle);
-}
-
-void sortTrianglePoints(Mesh* m, face_descriptor f0, face_descriptor f1, face_descriptor f2, std::vector<vertex_descriptor> points) {
-
-}
+#endif // _MESH_FNCTS_H_

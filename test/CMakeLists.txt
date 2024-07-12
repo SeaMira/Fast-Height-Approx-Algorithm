@@ -13,5 +13,7 @@ target_link_libraries(BMHeapTests
     gtest
 )
 
+target_include_directories(BMHeapTests PUBLIC ../include)
+
 include(GoogleTest)
 gtest_discover_tests(BMHeapTests)

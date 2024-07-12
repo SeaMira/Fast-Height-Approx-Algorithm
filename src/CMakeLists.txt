@@ -1,5 +1,5 @@
-set(HPP_LIST "${PROJECT_SOURCE_DIR}/include/Circle/circle.hpp")
-set(CPP_LIST "circle.cpp")
+set(FST_H_APROX_HPP_LIST "${PROJECT_SOURCE_DIR}/include/MeshFunctions/mesh_functions.hpp")
+set(FST_H_APROX_CPP_LIST "mesh_functions.cpp")
+add_library(fastHAprox  ${FST_H_APROX_CPP_LIST} ${FST_H_APROX_HPP_LIST})
+target_include_directories(fastHAprox PUBLIC ../include)
 
-add_library(circle  ${CPP_LIST} ${HEADER_LIST})
-target_include_directories(circle PUBLIC ../include)
