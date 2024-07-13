@@ -111,21 +111,27 @@ class FstHAproxMesh {
 
         // grid corners
         double left_x, left_y, right_x, right_y;
-
-        std::unordered_map<Face_handle, Vertex_handle> candPos; 
+        std::unordered_map<Face_handle, std::pair<Point, double>> candPos; 
         // Mesh::Property_map<face_descriptor, vertex_descriptor> candPos;
         // std::unordered_map<face_descriptor, std::vector<vertex_descriptor>> pointsInTriangle; 
         // Mesh::Property_map<face_descriptor, std::vector<vertex_descriptor>> pointsInTriangle;
 
+        // points to check from centroid to every direction
+        int steps;
+
+        // goal-check values
+        double VERTEX_GOAL, MAX_ERROR = 0.0, MAX_ERROR_GOAL;
     public:
         void scanTriangle(Face_handle triangle);
         Vertex_handle meshInsert(Point p);
         void insert(Point p);
         void greedyInsert():
+
+        bool goalMet();
         // void sortTrianglePoints(face_descriptor f0, face_descriptor f1, face_descriptor f2, std::vector<vertex_descriptor> points);
 
-        FstHAproxMesh(double left_x, double left_y, double right_x, double right_y);
-        FstHAproxMesh(const std::string &path, FT max_scalar, RasterInterpolationType interp = RasterInterpolationType::BILINEAR);
+        FstHAproxMesh(double left_x, double left_y, double right_x, double right_y, int steps, double MAX_ERROR_GOAL);
+        FstHAproxMesh(const std::string &path, FT max_scalar, RasterInterpolationType interp = RasterInterpolationType::BILINEAR, int steps, double MAX_ERROR_GOAL);
 };
 
 #endif // _MESH_FNCTS_H_

@@ -1,21 +1,71 @@
 #include <MeshFunctions/mesh_functions.hpp>
 
+///////////////// auxilliary functions //////////////////////////////
+bool isPointInTriangle(double x, double y, const Point& p0, const Point& p1, const Point& p2) {
+    K::Point_2 pt(x, y);
+    K::Triangle_2 tri(K::Point_2(p0.x(), p0.y()), K::Point_2(p1.x(), p1.y()), K::Point_2(p2.x(), p2.y()));
+    return tri.has_on(pt);
+}
+
+Point calculateCentroid(const Point& p0, const Point& p1, const Point& p2) {
+    return Point((p0.x() + p1.x() + p2.x()) / 3, (p0.y() + p1.y() + p2.y()) / 3, (p0.z() + p1.z() + p2.z()) / 3);
+}
+
+std::vector<Point> generateSearchPoints(const Point& centroid, const Point& p0, const Point& p1, const Point& p2, int steps) {
+    std::vector<Point> points;
+
+    auto addPointsInDirection = [&](const Point& start, const Point& direction) {
+        double delta = 1.0/(double)steps;
+        for (double i = 0.0; i < 1.0; i+=delta) {
+            double newX = start.x() + i * (direction.x() - start.x());
+            double newY = start.y() + i * (direction.y() - start.y());
+            if (isPointInTriangle(newX, newY, p0, p1, p2)) {
+                points.emplace_back(newX, newY, 0); // z-value will be determined by the height field H
+            }
+        }
+    };
+
+    // Generate points towards each vertex
+    addPointsInDirection(centroid, p0);
+    addPointsInDirection(centroid, p1);
+    addPointsInDirection(centroid, p2);
+
+    // Generate points towards the midpoints of each side
+    Point midpoint0((p0.x() + p1.x()) / 2, (p0.y() + p1.y()) / 2, 0);
+    Point midpoint1((p1.x() + p2.x()) / 2, (p2.y() + p2.y()) / 2, 0);
+    Point midpoint2((p2.x() + p0.x()) / 2, (p0.y() + p0.y()) / 2, 0);
+
+    addPointsInDirection(centroid, midpoint0);
+    addPointsInDirection(centroid, midpoint1);
+    addPointsInDirection(centroid, midpoint2);
+
+    return points;
+}
+
+//////////////////// end auxilliary funcitons //////////////////
+
+
+
 // constructor para el function field
-FstHAproxMesh::FstHAproxMesh(double left_x, double left_y, double right_x, double right_y) {
+FstHAproxMesh::FstHAproxMesh(double left_x, double left_y, double right_x, double right_y, int steps, double MAX_ERROR_GOAL) {
     H = FunctionField_2<FT>(simple_terrain_func, left_x, left_y, right_x, right_y);
     this->left_x = left_x;
     this->left_y = left_y;
     this->right_x = right_x;
     this->right_y = right_y;
+    this->steps = steps;
+    this->MAX_ERROR_GOAL = MAX_ERROR_GOAL;
 }
 
 
-FstHAproxMesh::FstHAproxMesh(const std::string &path, FT max_scalar, RasterInterpolationType interp = RasterInterpolationType::BILINEAR) {
+FstHAproxMesh::FstHAproxMesh(const std::string &path, FT max_scalar, RasterInterpolationType interp = RasterInterpolationType::BILINEAR, int steps, double MAX_ERROR_GOAL) {
     H = RasterFileField_2<FT>(path, max_scalar, interp);
     this->left_x = H.minX();
     this->left_y = H.minY();
     this->right_x = H.maxX();
     this->right_y = H.maxY();
+    this->steps = steps;
+    this->MAX_ERROR_GOAL = MAX_ERROR_GOAL;
 }
 
 
@@ -26,12 +76,15 @@ double InterpolateHeight(double A, double B, double C, double D, Point p) {
 
 // Función para escanear el triángulo y encontrar el punto con mayor error
 void FstHAproxMesh::scanTriangle(Face_handle triangle) {
-    Vertex_handle best;
+    Point best;
     double maxError = 0.0;
 
     Point p0 = triangle->vertex(0)->point();
     Point p1 = triangle->vertex(1)->point();
     Point p2 = triangle->vertex(2)->point();
+
+    Point centroid = calculateCentroid(p0, p1, p2);
+    std::vector<Point> searchPoints = generateSearchPoints(centroid, p0, p1, p2, steps);
 
     double A = (p1.y() - p0.y()) * (p2.z() - p0.z()) - (p1.z() - p0.z()) * (p2.y() - p0.y());
     double B = (p1.z() - p0.z()) * (p2.x() - p0.x()) - (p1.x() - p0.x()) * (p2.z() - p0.z());
@@ -40,16 +93,16 @@ void FstHAproxMesh::scanTriangle(Face_handle triangle) {
 
 
     // cambiar por uso de aproximacion dentro de triangulo
-    for (Vertex_handle vh : pointsIntriangle[triangle]) {
-        Point p = vh->point();
-        double interpolatedHeight = -(A * p.x() + B * p.y() + D) / C;
-        double error = std::abs(interpolatedHeight - p.z());
+    for (const auto& pt : searchPoints) {
+        double heightFieldZ = H(pt.x(), pt.y());
+        double interpolatedHeight = -(A * pt.x() + B * pt.y() + D) / C;
+        double error = std::abs(interpolatedHeight - heightFieldZ);
         if (error > maxError) {
             maxError = error;
-            best = vh;
+            best = pt;
         }
     }
-    if 
+    
 
     MAX_ERROR += maxError;
     candPos[triangle] = std::make_pair(best, maxError);
