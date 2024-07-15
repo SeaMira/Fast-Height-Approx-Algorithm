@@ -1,44 +1,49 @@
 #include <cmath>
 #include <vector>
 
-template<typename CT>
+template<typename KT, typename CT>
 class HeapNode;
 
-template<typename CT>
+template<typename KT, typename CT>
 class BMHeap;
 
 // Generic node for heap.
-template<typename CT>
+template<typename KT, typename CT>
 class HeapNode {
     public:
-        friend class BMHeap<CT>;
+        typedef BMHeap<CT> BMHeap;
+        friend class BMHeap;
         CT content;
-        float key() {
+        KT key() {
             return _key;
         }
     private:
         // Private constructor which can only be used by the BMHeap class.
-        HeapNode(float key, CT content) {
+        HeapNode(KT key, CT content) {
             this->_key = key;
             this->content = content;
         }
-        float _key;
+        KT _key;
 };
 
 // Binary max-heap, organized with floating point keys and with each node containing a value of type CT.
-template<typename CT>
+template<typename KT, typename CT>
 class BMHeap {
     public:
-        BMHeap() {
-            return;
-        }
+        typedef HeapNode<CT> HeapNode;
+        BMHeap() {}
 
         bool empty() const {
             return _elements.empty();
         }
 
+        void clear() {
+            _elements.clear();
+            return;
+        }
+
         // Returns a reference to the top element of the heap
-        HeapNode<CT> &top() {
+        HeapNode &top() {
             return _elements.front();
         }
 
@@ -50,7 +55,7 @@ class BMHeap {
 
         // Removes the referenced node from the heap.
         // Calling on an empty heap, or on a node reference that doesn't belong to the heap, is undefined behavior
-        void remove(HeapNode<CT> &node) {
+        void remove(HeapNode &node) {
             std::swap(node, _elements.back());
             _elements.pop_back();
             if (!empty()) reheap_down(node); //node ref now holds the value of the last element. original node value doesnt exist anymore
@@ -58,41 +63,41 @@ class BMHeap {
         };
 
         // Change the key of a node and reorder the heap
-        void update(HeapNode<CT> &node, float key) {
+        void update(HeapNode &node, KT key) {
             node._key = key;
             reheap(node);
             return;
         };
 
         // Insert element and reorder the heap
-        HeapNode<CT> &push(float key, CT content) {
-            _elements.push_back(HeapNode<CT>(key, content));
+        HeapNode &push(KT key, CT content) {
+            _elements.push_back(HeapNode(key, content));
             return reheap_up(_elements.back());
         };
 
-        int index_of(const HeapNode<CT> &node) const {
+        int index_of(const HeapNode &node) const {
             return (int)(&node - _elements.data()); // addr(node) - addr(array) / size
         };
 
-        int index_of_parent(HeapNode<CT> &node) {
+        int index_of_parent(HeapNode &node) {
             double idx = (double)(this->index_of(node));
             return (int)((idx-1)/2.0);
         };
 
-        int index_of_left(HeapNode<CT> &node) {
+        int index_of_left(HeapNode &node) {
             return 2*index_of(node)+1;
         };
 
-        int index_of_right(HeapNode<CT> &node) {
+        int index_of_right(HeapNode &node) {
             return 2*index_of(node)+2;
         }
 
     private:
-        std::vector<HeapNode<CT>> _elements;
+        std::vector<HeapNode> _elements;
         
-        HeapNode<CT> &reheap_up(HeapNode<CT> &node) {
-            HeapNode<CT> *curr = &node;
-            HeapNode<CT> *parent = &_elements[index_of_parent(node)];
+        HeapNode &reheap_up(HeapNode &node) {
+            HeapNode *curr = &node;
+            HeapNode *parent = &_elements[index_of_parent(node)];
             // compare with parent, if key[i]<=key[parent] then its all ok. if key[i]>key[parent] then swap and reheap
             while (curr->_key > parent->_key) {
                 std::swap(*curr, *parent);
@@ -102,10 +107,10 @@ class BMHeap {
             return *curr;
         }
 
-        void reheap_down(HeapNode<CT> &node) {
-            HeapNode<CT> *curr = &node;
-            HeapNode<CT> *left;
-            HeapNode<CT> *right;
+        void reheap_down(HeapNode &node) {
+            HeapNode *curr = &node;
+            HeapNode *left;
+            HeapNode *right;
             int il = index_of_left(*curr);
             int ir = index_of_right(*curr);
             while (1) {
@@ -125,7 +130,7 @@ class BMHeap {
             }
             return;
         };
-        void reheap(HeapNode<CT> &node) {
+        void reheap(HeapNode &node) {
             if (node._key > _elements[index_of_parent(*node)]._key) {
                 reheap_up(node);
                 return;
