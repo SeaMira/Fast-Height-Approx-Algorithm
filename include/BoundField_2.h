@@ -9,5 +9,5 @@ class BoundField_2 {
         // Querying outside the bounds is unspecified behavior.
         virtual FT operator()(FT x, FT y) = 0;
 
-        virtual FT minX() = 0, minY() = 0, maxX() = 0, maxY() = 0;
+        virtual FT const minX() = 0, minY() = 0, maxX() = 0, maxY() = 0;
 };

@@ -13,7 +13,7 @@ class BMHeapTest : public testing::Test {
             d0_data = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'};
         }
 
-        BMHeap<char> heap;
+        BMHeap<float, char> heap;
         std::vector<float> d0_keys;
         std::vector<char> d0_data;
 };
@@ -37,7 +37,7 @@ TEST_F(BMHeapTest, CheckEmpty) {
 
 TEST_F(BMHeapTest, TopReference) {
     heap.push(1.0,'a');
-    HeapNode<char> &top = heap.top();
+    HeapNode<float, char> &top = heap.top();
 
     EXPECT_FLOAT_EQ(top.key(), 1.0);
     EXPECT_EQ(top.content, 'a');
@@ -68,7 +68,7 @@ TEST_F(BMHeapTest, ExtractionOrder) {
     std::vector<char> extracted_data;
     std::vector<float> expected_keys(d0_keys.size());
     std::vector<char> expected_data(d0_keys.size());
-    HeapNode<char> &top = heap.top();
+    HeapNode<float, char> &top = heap.top();
     for (std::size_t i=0; i<d0_keys.size(); i++) {
         top = heap.top();
         extracted_keys.push_back(top.key());

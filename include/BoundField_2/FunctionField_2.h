@@ -17,10 +17,10 @@ class FunctionField_2 : public BoundField_2<FT> {
             return _func(x, y);
         };
 
-        FT minX() override { return _minX; }
-        FT minY() override { return _minY; }
-        FT maxX() override { return _maxX; }
-        FT maxY() override { return _maxY; }
+        FT const minX() override { return _minX; }
+        FT const minY() override { return _minY; }
+        FT const maxX() override { return _maxX; }
+        FT const maxY() override { return _maxY; }
 
     private:
         std::function<FT(FT, FT)> _func;

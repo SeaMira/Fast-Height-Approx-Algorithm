@@ -44,12 +44,14 @@ class RasterFileField_2 : public BoundField_2<FT> {
                     return z;
                 }
             }
+
+            return 0.0; //shouldnt ever happen
         };
 
-        FT minX() override { return _minX; }
-        FT minY() override { return _minY; }
-        FT maxX() override { return _maxX; }
-        FT maxY() override { return _maxY; }
+        FT const minX() override { return _minX; }
+        FT const minY() override { return _minY; }
+        FT const maxX() override { return _maxX; }
+        FT const maxY() override { return _maxY; }
 
     private:
         FT _minX, _minY, _maxX, _maxY;

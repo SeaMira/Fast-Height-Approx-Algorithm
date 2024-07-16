@@ -8,7 +8,7 @@ add_subdirectory(extern)
 
 find_package(CGAL REQUIRED OPTIONAL_COMPONENTS Qt5)
 message("CGAL Version: ${CGAL_VERSION}")
-find_package(ImageMagick COMPONENTS Magick++)
+find_package(ImageMagick COMPONENTS Magick++ MagickCore)
 include_directories(${ImageMagick_INCLUDE_DIRS})
 
 
@@ -21,6 +21,18 @@ target_link_libraries(bf_simple_demo PUBLIC
 target_include_directories(bf_simple_demo PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_definitions(bf_simple_demo PUBLIC #required by imagemagick for some reason
+    MAGICKCORE_HDRI_ENABLE
+    MAGICKCORE_QUANTUM_DEPTH=16)
+
+# demo fsthapproxmesh
+add_executable(fham_simple_demo
+    src/FstHApproxMesh_demo.cpp)
+target_link_libraries(fham_simple_demo PUBLIC
+    CGAL
+    ${ImageMagick_LIBRARIES})
+target_include_directories(fham_simple_demo PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_definitions(fham_simple_demo PUBLIC #required by imagemagick for some reason
     MAGICKCORE_HDRI_ENABLE
     MAGICKCORE_QUANTUM_DEPTH=16)
 
