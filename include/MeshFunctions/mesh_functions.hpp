@@ -42,11 +42,11 @@ class FstHApproxMesh {
         typedef CGAL::Surface_mesh<Point>                   Mesh;
 
         FstHApproxMesh(BoundField &height_field): H(height_field) {}
-        Mesh operator()(size_t goal_vertices, float goal_error, unsigned int steps) {
+        Mesh operator()(size_t goal_vertices, double goal_error, unsigned int steps) {
             m.clear();
             err_heap.clear();
             face_node.clear();
-            INV_STEPS = 1.0/steps;
+            INV_STEPS = 1.0/(double)steps;
             VERTEX_GOAL = goal_vertices;
             ERROR_GOAL = goal_error;
             total_error = 0.0;
@@ -63,9 +63,10 @@ class FstHApproxMesh {
             // mientra no se llega a la meta se revisa el nuevo candidato
             while (!goalMet()) {
                 std::pair<Delaunay::Face_handle, Point> t = err_heap.top().content;
-                float err = err_heap.top().key(); // Recuperar la llave, que corresponde al error de este punto
+                double err = err_heap.top().key(); // Recuperar la llave, que corresponde al error de este punto
                 err_heap.pop();
                 total_error -= err;
+                std::cout << t.second.x() << " " << t.second.y() << std::endl;
                 insert(t.second, t.first); // Insertar el duo punto/cara con mayor error
             }
 
@@ -83,10 +84,10 @@ class FstHApproxMesh {
     private:
         Delaunay m;
         BoundField &H;
-        BMHeap<float, std::pair<Face_handle, Point>> err_heap;
-        std::unordered_map<Face_handle, HeapNode<float, std::pair<Face_handle, Point>>*> face_node; // each face handle is linked to a node on the heap
+        BMHeap<double, std::pair<Face_handle, Point>> err_heap;
+        std::unordered_map<Face_handle, HeapNode<double, std::pair<Face_handle, Point>>*> face_node; // each face handle is linked to a node on the heap
         size_t VERTEX_GOAL;
-        float ERROR_GOAL, total_error;
+        double ERROR_GOAL, total_error;
         FT INV_STEPS;
 
         std::unordered_map<Delaunay::Face_handle, std::pair<Point, double>> candPos; 
@@ -99,14 +100,14 @@ class FstHApproxMesh {
         void scanTriangle(Delaunay::Face_handle triangle) {
             // Triangles are only scanned once, so we create the heap node here
             Point best;
-            float maxError = 0.0;
+            double maxError = 0.0;
 
             Point p0 = triangle->vertex(0)->point();
             Point p1 = triangle->vertex(1)->point();
             Point p2 = triangle->vertex(2)->point();
 
             Point centroid = CGAL::centroid(p0, p1, p2);
-            /*
+            
             std::vector<Point> searchPoints = generateSearchPoints(centroid, p0, p1, p2);
             double A = (p1.y() - p0.y()) * (p2.z() - p0.z()) - (p1.z() - p0.z()) * (p2.y() - p0.y());
             double B = (p1.z() - p0.z()) * (p2.x() - p0.x()) - (p1.x() - p0.x()) * (p2.z() - p0.z());
@@ -117,20 +118,19 @@ class FstHApproxMesh {
             for (const auto& pt : searchPoints) {
                 double heightFieldZ = H(pt.x(), pt.y());
                 double interpolatedHeight = -(A * pt.x() + B * pt.y() + D) / C;
-                float error = std::abs(interpolatedHeight - pt.z());
+                double error = std::abs(interpolatedHeight - pt.z());
                 if (error > maxError) {
                     maxError = error;
                     best = pt;
                 }
             }
-            */
-
-            maxError = abs(centroid.z() - H(centroid.x(), centroid.y()));
-            best = centroid;
+            
+            // maxError = abs(centroid.z() - H(centroid.x(), centroid.y()));
+            // best = centroid;
             total_error += maxError;
 
             // insertar el triangulo en el heap y asociarlo a este triangulo
-            HeapNode<float, std::pair<Face_handle, Point>> *this_triangle_node = &(err_heap.push(maxError, std::make_pair(triangle, best)));
+            HeapNode<double, std::pair<Face_handle, Point>> *this_triangle_node = &(err_heap.push(maxError, std::make_pair(triangle, best)));
             face_node.emplace(triangle, this_triangle_node);
 
             return;
@@ -139,13 +139,16 @@ class FstHApproxMesh {
         void insert(Point p, Delaunay::Face_handle f_hint) {
             Delaunay::Vertex_handle vh = m.insert(p);
             // Obtener las nuevas caras generadas por la inserción y escanearlas
-            Delaunay::Face_circulator new_f_start = m.incident_faces(vh);
-            Delaunay::Face_circulator new_f = new_f_start;
-            do {
-                if (!m.is_infinite(new_f)) {
-                    scanTriangle(new_f);
-                }
-            } while (++new_f != new_f_start);
+            // Delaunay::Face_circulator new_f_start = m.incident_faces(vh);
+            Delaunay::Face_circulator new_f_start = m.incident_faces(vh), done(new_f_start);
+            // Delaunay::Face_circulator new_f = new_f_start;
+            if (new_f_start != 0){
+                do {
+                    if (!m.is_infinite(new_f_start)) {
+                        scanTriangle(new_f_start);
+                    }
+                } while (++new_f_start != done);
+            }
             return;
         }
 
@@ -161,12 +164,12 @@ class FstHApproxMesh {
             return abs(a0 - (a1 + a2 + a3)) < 0.00001;
         }
 
-        /*
+        
         std::vector<Point> generateSearchPoints(const Point& centroid, const Point& p0, const Point& p1, const Point& p2) {
             std::vector<Point> points;
 
             auto addPointsInDirection = [&](const Point& start, const Point& direction) {
-                for (double i = 0.0; i < 1.0; i+=INV_STEPS) {
+                for (double i = 0.0; i <= 1.0; i+=INV_STEPS) {
                     double newX = start.x() + i * (direction.x() - start.x());
                     double newY = start.y() + i * (direction.y() - start.y());
                     if (isPointInTriangle(newX, newY, p0, p1, p2)) {
@@ -191,10 +194,12 @@ class FstHApproxMesh {
 
             return points;
         }
-        */
+        
 
 
         bool goalMet() {
+            std::cout << m.number_of_vertices() << std::endl;
+            // std::cout << err_heap.empty() << std::endl;
             return (m.number_of_vertices() >= VERTEX_GOAL);// || (total_error < ERROR_GOAL);
         }
 };
