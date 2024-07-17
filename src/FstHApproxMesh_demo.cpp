@@ -50,25 +50,26 @@ int main(int argc, char **argv) {
 
     int mode = std::stoi(argv[1]);
     int MAX_POINTS = std::stoi(argv[2]);
+    int step = std::stoi(argv[3]);
     switch (mode) {
         case 1: {
             std::cout << "Random noise function" << std::endl;
-            FT hlf_grid_size = std::stod(argv[3]);
-            const char* out_file_name = argv[4];
+            FT hlf_grid_size = std::stod(argv[4]);
+            const char* out_file_name = argv[5];
             FunctionField_2<FT> HF([&perlin](FT x, FT y) { return simple_terrain_func(x, y, perlin); }, -hlf_grid_size, -hlf_grid_size, hlf_grid_size, hlf_grid_size);
             FstHApproxMesh fham_field(HF);
-            CGAL::Surface_mesh<Point> function_mesh = fham_field(MAX_POINTS, 0.01, 6);
+            CGAL::Surface_mesh<Point> function_mesh = fham_field(MAX_POINTS, 0.01, step);
             CGAL::IO::write_OBJ(out_file_name, function_mesh);
             break;
         }
         case 2: {
             std::cout << "Raster function" << std::endl;
-            float MAX_Z = std::stof(argv[3]);
-            const char* in_file_name = argv[4];
-            const char* out_file_name = argv[5];
+            float MAX_Z = std::stof(argv[4]);
+            const char* in_file_name = argv[5];
+            const char* out_file_name = argv[6];
             RasterFileField_2<FT> HR(in_file_name, MAX_Z, RasterInterpolationType::BILINEAR);
             FstHApproxMesh fham_raster(HR);
-            CGAL::Surface_mesh<Point> raster_mesh = fham_raster(MAX_POINTS, 0.01, 6);
+            CGAL::Surface_mesh<Point> raster_mesh = fham_raster(MAX_POINTS, 0.01, step);
             CGAL::IO::write_OBJ(out_file_name, raster_mesh);
             break;
         }

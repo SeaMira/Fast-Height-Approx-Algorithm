@@ -20,6 +20,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Projection_traits_xy_3.h>
 #include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Kernel/global_functions_2.h>
 
 #include "BMHeap.h"
 #include "BoundField_2.h"
@@ -66,7 +67,8 @@ class FstHApproxMesh {
                 double err = err_heap.top().key(); // Recuperar la llave, que corresponde al error de este punto
                 err_heap.pop();
                 total_error -= err;
-                std::cout << t.second.x() << " " << t.second.y() << std::endl;
+                // std::cout << t.second.x() << " " << t.second.y() << " " << t.second.z() << std::endl;
+                // std::cout << err << std::endl;
                 insert(t.second, t.first); // Insertar el duo punto/cara con mayor error
             }
 
@@ -157,11 +159,12 @@ class FstHApproxMesh {
             K::Point_2 p0d(p0.x(), p0.y());
             K::Point_2 p1d(p1.x(), p1.y());
             K::Point_2 p2d(p2.x(), p2.y());
-            double a0 = CGAL::area(p0d, p1d, p2d);
-            double a1 = CGAL::area(p, p1d, p2d);
-            double a2 = CGAL::area(p0d, p, p2d);
-            double a3 = CGAL::area(p0d, p1d, p);
-            return abs(a0 - (a1 + a2 + a3)) < 0.00001;
+            // Check if point p is inside the triangle p0d, p1d, p2d
+            bool b1 = CGAL::orientation(p, p0d, p1d) != CGAL::LEFT_TURN;
+            bool b2 = CGAL::orientation(p, p1d, p2d) != CGAL::LEFT_TURN;
+            bool b3 = CGAL::orientation(p, p2d, p0d) != CGAL::LEFT_TURN;
+
+            return b1 == b2 && b2 == b3;
         }
 
         
@@ -198,7 +201,7 @@ class FstHApproxMesh {
 
 
         bool goalMet() {
-            std::cout << m.number_of_vertices() << std::endl;
+            // std::cout << m.number_of_vertices() << std::endl;
             // std::cout << err_heap.empty() << std::endl;
             return (m.number_of_vertices() >= VERTEX_GOAL);// || (total_error < ERROR_GOAL);
         }
