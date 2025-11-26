@@ -1,5 +1,7 @@
 # Aproximación de Terrenos y Campos de Altura
 
+![demo image](demo.png)
+
 En este proyecto del ramo de Geometría Computacional CC5502-1 - Otoño 2024 se tuvo el principal objetivo de implementar un algoritmo capaz de recrear un campo de alturas/terreno/malla con su función de altura H(x,y) (esto retorna un valor para z en esa coordenada) en un mesh triangular aproximado que minimize el error entre los datos utilizados y los designados por la data.
 
 Principalmente puede ser utilizado para renderizado de terreno y un mejor o peor nivel de detalle.
